@@ -1,0 +1,193 @@
+Grammar
+
+    0 $accept: unit "end of file"
+
+    1 unit: line
+    2     | unit line
+
+    3 line: TK_NEWLINE
+    4     | expression TK_NEWLINE
+    5     | TK_QUIT TK_NEWLINE
+
+    6 expression: TK_IVAL
+    7           | expression TK_PLUS expression
+    8           | expression TK_MINUS expression
+
+
+Terminals, with rules where they appear
+
+"end of file" (0) 0
+error (256)
+TK_IVAL (258) 6
+TK_PLUS (259) 7
+TK_MINUS (260) 8
+TK_NEWLINE (261) 3 4 5
+TK_QUIT (262) 5
+
+
+Nonterminals, with rules where they appear
+
+$accept (8)
+    on left: 0
+unit (9)
+    on left: 1 2, on right: 0 2
+line (10)
+    on left: 3 4 5, on right: 1 2
+expression (11)
+    on left: 6 7 8, on right: 4 7 8
+
+
+State 0
+
+    0 $accept: . unit "end of file"
+    1 unit: . line
+    2     | . unit line
+    3 line: . TK_NEWLINE
+    4     | . expression TK_NEWLINE
+    5     | . TK_QUIT TK_NEWLINE
+    6 expression: . TK_IVAL
+    7           | . expression TK_PLUS expression
+    8           | . expression TK_MINUS expression
+
+    TK_IVAL     shift, and go to state 1
+    TK_NEWLINE  shift, and go to state 2
+    TK_QUIT     shift, and go to state 3
+
+    unit        go to state 4
+    line        go to state 5
+    expression  go to state 6
+
+
+State 1
+
+    6 expression: TK_IVAL .
+
+    $default  reduce using rule 6 (expression)
+
+
+State 2
+
+    3 line: TK_NEWLINE .
+
+    $default  reduce using rule 3 (line)
+
+
+State 3
+
+    5 line: TK_QUIT . TK_NEWLINE
+
+    TK_NEWLINE  shift, and go to state 7
+
+
+State 4
+
+    0 $accept: unit . "end of file"
+    2 unit: unit . line
+    3 line: . TK_NEWLINE
+    4     | . expression TK_NEWLINE
+    5     | . TK_QUIT TK_NEWLINE
+    6 expression: . TK_IVAL
+    7           | . expression TK_PLUS expression
+    8           | . expression TK_MINUS expression
+
+    "end of file"  shift, and go to state 8
+    TK_IVAL        shift, and go to state 1
+    TK_NEWLINE     shift, and go to state 2
+    TK_QUIT        shift, and go to state 3
+
+    line        go to state 9
+    expression  go to state 6
+
+
+State 5
+
+    1 unit: line .
+
+    $default  reduce using rule 1 (unit)
+
+
+State 6
+
+    4 line: expression . TK_NEWLINE
+    7 expression: expression . TK_PLUS expression
+    8           | expression . TK_MINUS expression
+
+    TK_PLUS     shift, and go to state 10
+    TK_MINUS    shift, and go to state 11
+    TK_NEWLINE  shift, and go to state 12
+
+
+State 7
+
+    5 line: TK_QUIT TK_NEWLINE .
+
+    $default  reduce using rule 5 (line)
+
+
+State 8
+
+    0 $accept: unit "end of file" .
+
+    $default  accept
+
+
+State 9
+
+    2 unit: unit line .
+
+    $default  reduce using rule 2 (unit)
+
+
+State 10
+
+    6 expression: . TK_IVAL
+    7           | . expression TK_PLUS expression
+    7           | expression TK_PLUS . expression
+    8           | . expression TK_MINUS expression
+
+    TK_IVAL  shift, and go to state 1
+
+    expression  go to state 13
+
+
+State 11
+
+    6 expression: . TK_IVAL
+    7           | . expression TK_PLUS expression
+    8           | . expression TK_MINUS expression
+    8           | expression TK_MINUS . expression
+
+    TK_IVAL  shift, and go to state 1
+
+    expression  go to state 14
+
+
+State 12
+
+    4 line: expression TK_NEWLINE .
+
+    $default  reduce using rule 4 (line)
+
+
+State 13
+
+    7 expression: expression . TK_PLUS expression
+    7           | expression TK_PLUS expression .  [TK_PLUS, TK_MINUS, TK_NEWLINE]
+    8           | expression . TK_MINUS expression
+
+    $default  reduce using rule 7 (expression)
+
+    Conflict between rule 7 and token TK_PLUS resolved as reduce (%left TK_PLUS).
+    Conflict between rule 7 and token TK_MINUS resolved as reduce (%left TK_MINUS).
+
+
+State 14
+
+    7 expression: expression . TK_PLUS expression
+    8           | expression . TK_MINUS expression
+    8           | expression TK_MINUS expression .  [TK_PLUS, TK_MINUS, TK_NEWLINE]
+
+    $default  reduce using rule 8 (expression)
+
+    Conflict between rule 8 and token TK_PLUS resolved as reduce (%left TK_PLUS).
+    Conflict between rule 8 and token TK_MINUS resolved as reduce (%left TK_MINUS).
